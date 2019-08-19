@@ -1,5 +1,7 @@
 use std::num::ParseIntError;
 use std::mem;
+use std::str::Chars;
+use std::char;
 
 fn add<'l>(a: &'l mut &'l str, b: &'l mut &'l str) -> Result<String, ParseIntError> {
 
@@ -9,22 +11,50 @@ fn add<'l>(a: &'l mut &'l str, b: &'l mut &'l str) -> Result<String, ParseIntErr
         was_swapped = true;
     }
 
-
+    println!("a = {}, b = {}", a, b);
     let mut str:String = "".to_string();
 
     let n1 = a.len();
     let n2 = b.len();
 
-    let a_rev = a.chars().rev().collect::<String>();
-    let b_rev = b.chars().rev().collect::<String>();
+    let a_rev = a.chars().rev();
+    let b_rev = b.chars().rev();
 
+    println!("a_rev = {}, b_rev = {}", a_rev.clone().collect::<String>(), b_rev.clone().collect::<String>());
     let mut carry = 0;
 
-    for x in 0..n1 {
+    let a_rev_vec = a_rev.collect::<Vec<char>>();
+    let b_rev_vec = b_rev.collect::<Vec<char>>();
+
+    println!("----------------------");
+
+    let mut sum: u32 = 0;
+    for x in a_rev_vec.iter().enumerate(){
+
+        let a_char_val = *x.1;
+        let b_char_val = b_rev_vec[x.0];
         // Do school mathematics, compute sum of
         // current digits and carry
-        let sum = (a_rev.as_bytes()[x])+(b_rev.as_bytes()[x])+carry;
-        str.push(char::from((sum % 10).to_ascii_lowercase()));
+        let a_int_opt = a_char_val.to_digit(10);
+        let b_int_opt = b_char_val.to_digit(10);
+
+        match a_int_opt {
+            Some(a_int) => match b_int_opt {
+                Some(b_int) => sum = a_int + b_int + carry,
+                _ => panic!(),
+            }
+            _ => panic!(),
+        }
+        println!("a_char_val = {}, b_char_val = {}", a_char_val, b_char_val);
+        println!("sum = {}", sum);
+//        let ch = char::from_digit(4, 10);
+        let ch_opt = char::from_digit(sum % 10, 10);
+
+        match ch_opt {
+            Some(ch) => {println!("ch = {}", ch); str.push(ch); println!("str = {}", str)},
+            _ => panic!()
+        }
+
 
         // Calculate carry for next step
         carry = sum/10;
@@ -33,13 +63,28 @@ fn add<'l>(a: &'l mut &'l str, b: &'l mut &'l str) -> Result<String, ParseIntErr
 
     for x in n1..n2 {
 
-        let sum = ((b_rev.as_bytes()[x])+carry);
-        str.push(char::from((sum % 10).to_ascii_lowercase()));
+        let b_char_val = b_rev_vec[x];
+        let b_int_opt = b_char_val.to_digit(10);
+
+        match b_int_opt {
+            Some(b_int) => sum = b_int + carry,
+            _ => panic!(),
+        }
+        let ch_opt = char::from_digit(sum % 10, 10);
+        match ch_opt {
+            Some(ch) => {println!("ch = {}", ch); str.push(ch); println!("str = {}", str)},
+            _ => panic!()
+        }
+
         carry = sum/10;
     }
 
     if carry != 0 {
-        str.push(char::from((carry).to_ascii_lowercase()));
+        let carry_opt = char::from_digit(carry, 10);
+        match carry_opt {
+            Some(ch) => {println!("ch = {}", ch); str.push(ch); println!("str = {}", str)},
+            _ => panic!()
+        }
     }
 
 
@@ -103,7 +148,22 @@ mod tests {
 
     #[test]
     fn test_sum1() {
-        assert_eq!(add(&mut "4", &mut "8"), Ok("12".to_string()));
+        assert_eq!(add(&mut "321", &mut "432"), Ok("753".to_string()));
+    }
+
+    #[test]
+    fn test_sum2() {
+        assert_eq!(add(&mut "741", &mut "468"), Ok("1209".to_string()));
+    }
+
+    #[test]
+    fn test_sum3() {
+        assert_eq!(add(&mut "852147", &mut "9568"), Ok("861715".to_string()));
+    }
+
+    #[test]
+    fn test_sum4() {
+        assert_eq!(add(&mut "852147", &mut "95689562"), Ok("96541709".to_string()));
     }
 }
 
