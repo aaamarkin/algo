@@ -47,14 +47,12 @@ fn add<'l>(a: &'l mut &'l str, b: &'l mut &'l str) -> Result<String, ParseIntErr
         }
         println!("a_char_val = {}, b_char_val = {}", a_char_val, b_char_val);
         println!("sum = {}", sum);
-//        let ch = char::from_digit(4, 10);
         let ch_opt = char::from_digit(sum % 10, 10);
 
         match ch_opt {
             Some(ch) => {println!("ch = {}", ch); str.push(ch); println!("str = {}", str)},
             _ => panic!()
         }
-
 
         // Calculate carry for next step
         carry = sum/10;
@@ -87,13 +85,6 @@ fn add<'l>(a: &'l mut &'l str, b: &'l mut &'l str) -> Result<String, ParseIntErr
         }
     }
 
-
-//    let a_parsed: i64 = a.parse::<i64>()?;
-//    let b_parsed: i64 = b.parse::<i64>()?;
-//
-//    let res = a_parsed * b_parsed;
-//    let res_str = res.to_string();
-
     if was_swapped {
         mem::swap( a, b);
     }
@@ -104,15 +95,23 @@ fn add<'l>(a: &'l mut &'l str, b: &'l mut &'l str) -> Result<String, ParseIntErr
 //27182818
 //3141 * 1000 + 592
 
-fn multiply(a: &str, b: &str) -> Result<String, ParseIntError> {
-    let power = a.len() / 2;
-    let f_index = a.len() - power;
-    let a1 = &a[0..f_index];
-    let a0 = &a[f_index..a.len()];
+fn multiply(x: &str, y: &str) -> Result<String, ParseIntError> {
+    let power = x.len() / 2;
+    let f_index = x.len() - power;
+    let x1 = &x[0..f_index];
+    let x0 = &x[f_index..x.len()];
 
+    let y1 = &y[0..f_index];
+    let y0 = &y[f_index..y.len()];
 
-    let a_parsed: i64 = a.parse::<i64>()?;
-    let b_parsed: i64 = b.parse::<i64>()?;
+    let a = x1 * y1;
+    let b = x0 * y0;
+    let p = (x1 + x0) * (y1 + y0);
+
+//    return a * 2**x.len() + (p - a - b)*(2**power) + b;
+
+    let a_parsed: i64 = x.parse::<i64>()?;
+    let b_parsed: i64 = y.parse::<i64>()?;
 
     let res = a_parsed * b_parsed;
     let res_str = res.to_string();
