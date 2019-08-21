@@ -44,70 +44,116 @@ fn isSmaller(q: &str, w: &str) -> bool {
     return false;
 }
 
-//string findDiff(string str1, string str2)
-//{
-//// Before proceeding further, make sure str1
-//// is not smaller
-//if (isSmaller(str1, str2))
-//swap(str1, str2);
-//
-//// Take an empty string for storing result
-//string str = "";
-//
-//// Calculate length of both string
-//int n1 = str1.length(), n2 = str2.length();
-//
-//// Reverse both of strings
-//reverse(str1.begin(), str1.end());
-//reverse(str2.begin(), str2.end());
-//
-//int carry = 0;
-//
-//// Run loop till small string length
-//// and subtract digit of str1 to str2
-//for (int i=0; i<n2; i++)
-//{
-//// Do school mathematics, compute difference of
-//// current digits
-//
-//int sub = ((str1[i]-'0')-(str2[i]-'0')-carry);
-//
-//// If subtraction is less then zero
-//// we add then we add 10 into sub and
-//// take carry as 1 for calculating next step
-//if (sub < 0)
-//{
-//sub = sub + 10;
-//carry = 1;
-//}
-//else
-//carry = 0;
-//
-//str.push_back(sub + '0');
-//}
-//
-//// subtract remaining digits of larger number
-//for (int i=n2; i<n1; i++)
-//{
-//int sub = ((str1[i]-'0') - carry);
-//
-//// if the sub value is -ve, then make it positive
-//if (sub < 0)
-//{
-//sub = sub + 10;
-//carry = 1;
-//}
-//else
-//carry = 0;
-//
-//str.push_back(sub + '0');
-//}
-//
-//// reverse resultant string
-//reverse(str.begin(), str.end());
-//
-//return str;
-//}
+fn subtract<'l>(q: &'l str, w: &'l str) -> Result<String, ParseIntError> {
+
+    let mut a = q.clone().to_string();
+    let mut b = w.clone().to_string();
+
+    let mut was_swapped = false;
+
+    // Before proceeding further, make sure str1
+    // is not smaller
+
+    if isSmaller(&a, &b) {
+        mem::swap(  &mut a, &mut b);
+        was_swapped = true;
+    }
+
+    // Take an empty string for storing result
+    let mut str:String = "".to_string();
+
+    // Calculate length of both string
+    let n1 = a.len();
+    let n2 = b.len();
+
+    let a_rev = a.chars().rev();
+    let b_rev = b.chars().rev();
+
+    let mut carry = 0;
+
+    let a_rev_vec = a_rev.collect::<Vec<char>>();
+    let b_rev_vec = b_rev.collect::<Vec<char>>();
+
+    let mut sub: u32 = 0;
+    // Run loop till small string length
+    // and subtract digit of str1 to str2
+    for x in b_rev_vec.iter().enumerate() {
+        // Do school mathematics, compute difference of
+        // current digits
+
+        let b_char_val = *x.1;
+        let a_char_val = a_rev_vec[x.0];
+        // Do school mathematics, compute sum of
+        // current digits and carry
+        let a_int_opt = a_char_val.to_digit(10);
+        let b_int_opt = b_char_val.to_digit(10);
+
+        match a_int_opt {
+            Some(a_int) => match b_int_opt {
+                Some(b_int) => {
+                    // If subtraction is less then zero
+                    // we add then we add 10 into sub and
+                    // take carry as 1 for calculating next step
+                    if a_int < b_int || a_int < carry || a_int < (b_int + carry)
+                    {
+                        sub = (a_int + 10) - b_int - carry;
+                        carry = 1;
+                    }
+                    else {
+                        sub = a_int - b_int - carry;
+                        carry = 0;
+                    }
+
+
+                },
+                _ => panic!(),
+            }
+            _ => panic!(),
+        }
+
+
+
+        let ch_opt = char::from_digit(sub, 10);
+
+        match ch_opt {
+            Some(ch) => {println!("ch = {}", ch); str.push(ch); println!("str = {}", str)},
+            _ => panic!()
+        }
+    }
+
+    // subtract remaining digits of larger number
+    for x in n2..n1 {
+        let a_char_val = a_rev_vec[x];
+        let a_int_opt = a_char_val.to_digit(10);
+        match a_int_opt {
+            Some(a_int) => {
+                if a_int < carry
+                {
+                    sub = (a_int + 10) - carry ;
+                    carry = 1;
+                }
+                else
+                {
+                    sub = a_int - carry ;
+                    carry = 0;
+                }
+            },
+            _ => panic!(),
+        }
+        // if the sub value is -ve, then make it positive
+
+
+
+        let ch_opt = char::from_digit(sub, 10);
+        match ch_opt {
+            Some(ch) => {println!("ch = {}", ch); str.push(ch); println!("str = {}", str)},
+            _ => panic!()
+        }
+    }
+
+    // reverse resultant string
+    return Ok(str.chars().rev().collect::<String>());
+}
 
 fn add<'l>(q: &'l str, w: &'l str) -> Result<String, ParseIntError> {
 
@@ -115,6 +161,7 @@ fn add<'l>(q: &'l str, w: &'l str) -> Result<String, ParseIntError> {
     let mut b = w.clone().to_string();
 
     let mut was_swapped = false;
+
     if a.len() > b.len() {
         mem::swap(  &mut a, &mut b);
         was_swapped = true;
@@ -230,9 +277,16 @@ fn multiply(x: &str, y: &str) -> Result<String, ParseIntError> {
     let d = add(y1, y0)?;
     let p = multiply(&c, &d )?;
 
-//    let h1 = multiply(&a, 2**x.len())?;
-//    let h1 = multiply(&a, 2**x.len())?;
-//    return a * 2**x.len() + (p - a - b)*(2**power) + b;
+    let char1 = char::from_digit(2u32.pow(x.len()), 10)?;
+    let char2 = char::from_digit(2u32.pow(power), 10)?;
+    let h1 = multiply(&a, &char1.to_string())?;
+    let h2 = subtract(&p, &a)?;
+    let h3 = subtract(&h2, &b)?;
+    let h4 = multiply(&h3, &char2.to_string())?;
+    let h5 = add(&h1, &h4)?;
+    let h6 = add(&h5, &b)?;
+
+    return Ok(h6);
 
     let a_parsed: i64 = x.parse::<i64>()?;
     let b_parsed: i64 = y.parse::<i64>()?;
@@ -257,15 +311,15 @@ mod tests {
         assert_eq!(multiply("8", "8"), Ok("64".to_string()));
     }
 
-//    #[test]
-//    fn test_mul3() {
-//        assert_eq!(multiply("58632", "897256"), Ok("52607913792".to_string()));
-//    }
-//
-//    #[test]
-//    fn test_mul4() {
-//        assert_eq!(multiply("8", "8"), Ok("64".to_string()));
-//    }
+    #[test]
+    fn test_mul3() {
+        assert_eq!(multiply("58632", "897256"), Ok("52607913792".to_string()));
+    }
+
+    #[test]
+    fn test_mul4() {
+        assert_eq!(multiply("8", "8"), Ok("64".to_string()));
+    }
 
 
     #[test]
@@ -310,6 +364,27 @@ mod tests {
     #[test]
     fn is_smaller4() {
         assert_eq!(isSmaller( "1211231231", "2123123"), false);
+    }
+
+
+    #[test]
+    fn test_subtract1() {
+        assert_eq!(subtract("741", "468"), Ok("273".to_string()));
+    }
+
+    #[test]
+    fn test_subtract2() {
+        assert_eq!(subtract( "321", "432"), Ok("111".to_string()));
+    }
+
+    #[test]
+    fn test_subtract3() {
+        assert_eq!(subtract("852147", "9568"), Ok("842579".to_string()));
+    }
+
+    #[test]
+    fn test_subtract4() {
+        assert_eq!(subtract( "852147", "95689562"), Ok("94837415".to_string()));
     }
 }
 
