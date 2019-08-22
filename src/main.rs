@@ -3,6 +3,21 @@ use std::mem;
 use std::str::Chars;
 use std::char;
 use std::ops::Deref;
+use std::io::{self, Write};
+
+macro_rules! myprintln {
+      () => ();
+      ($($arg:tt)*) => (print!(""));
+//    () => ($crate::print!("\n"));
+//    ($($arg:tt)*) => (println!($($arg)*));
+}
+
+macro_rules! myprintln2 {
+//      () => ();
+//      ($($arg:tt)*) => (print!(""));
+    () => ($crate::print!("\n"));
+    ($($arg:tt)*) => (println!($($arg)*));
+}
 
 fn isSmaller(q: &str, w: &str) -> bool {
     // Calculate lengths of both string
@@ -116,7 +131,7 @@ fn subtract<'l>(q: &'l str, w: &'l str) -> Result<String, ParseIntError> {
         let ch_opt = char::from_digit(sub, 10);
 
         match ch_opt {
-            Some(ch) => {println!("ch = {}", ch); str.push(ch); println!("str = {}", str)},
+            Some(ch) => {myprintln!("ch = {}", ch); str.push(ch); myprintln!("str = {}", str)},
             _ => panic!()
         }
     }
@@ -146,7 +161,7 @@ fn subtract<'l>(q: &'l str, w: &'l str) -> Result<String, ParseIntError> {
 
         let ch_opt = char::from_digit(sub, 10);
         match ch_opt {
-            Some(ch) => {println!("ch = {}", ch); str.push(ch); println!("str = {}", str)},
+            Some(ch) => {myprintln!("ch = {}", ch); str.push(ch); myprintln!("str = {}", str)},
             _ => panic!()
         }
     }
@@ -167,7 +182,7 @@ fn add<'l>(q: &'l str, w: &'l str) -> Result<String, ParseIntError> {
         was_swapped = true;
     }
 
-    println!("a = {}, b = {}", a, b);
+    myprintln!("a = {}, b = {}", a, b);
     let mut str:String = "".to_string();
 
     let n1 = a.len();
@@ -176,13 +191,13 @@ fn add<'l>(q: &'l str, w: &'l str) -> Result<String, ParseIntError> {
     let a_rev = a.chars().rev();
     let b_rev = b.chars().rev();
 
-    println!("a_rev = {}, b_rev = {}", a_rev.clone().collect::<String>(), b_rev.clone().collect::<String>());
+    myprintln!("a_rev = {}, b_rev = {}", a_rev.clone().collect::<String>(), b_rev.clone().collect::<String>());
     let mut carry = 0;
 
     let a_rev_vec = a_rev.collect::<Vec<char>>();
     let b_rev_vec = b_rev.collect::<Vec<char>>();
 
-    println!("----------------------");
+    myprintln!("----------------------");
 
     let mut sum: u32 = 0;
     for x in a_rev_vec.iter().enumerate(){
@@ -201,12 +216,12 @@ fn add<'l>(q: &'l str, w: &'l str) -> Result<String, ParseIntError> {
             }
             _ => panic!(),
         }
-        println!("a_char_val = {}, b_char_val = {}", a_char_val, b_char_val);
-        println!("sum = {}", sum);
+        myprintln!("a_char_val = {}, b_char_val = {}", a_char_val, b_char_val);
+        myprintln!("sum = {}", sum);
         let ch_opt = char::from_digit(sum % 10, 10);
 
         match ch_opt {
-            Some(ch) => {println!("ch = {}", ch); str.push(ch); println!("str = {}", str)},
+            Some(ch) => {myprintln!("ch = {}", ch); str.push(ch); myprintln!("str = {}", str)},
             _ => panic!()
         }
 
@@ -226,7 +241,7 @@ fn add<'l>(q: &'l str, w: &'l str) -> Result<String, ParseIntError> {
         }
         let ch_opt = char::from_digit(sum % 10, 10);
         match ch_opt {
-            Some(ch) => {println!("ch = {}", ch); str.push(ch); println!("str = {}", str)},
+            Some(ch) => {myprintln!("ch = {}", ch); str.push(ch); myprintln!("str = {}", str)},
             _ => panic!()
         }
 
@@ -236,7 +251,7 @@ fn add<'l>(q: &'l str, w: &'l str) -> Result<String, ParseIntError> {
     if carry != 0 {
         let carry_opt = char::from_digit(carry, 10);
         match carry_opt {
-            Some(ch) => {println!("ch = {}", ch); str.push(ch); println!("str = {}", str)},
+            Some(ch) => {myprintln!("ch = {}", ch); str.push(ch); myprintln!("str = {}", str)},
             _ => panic!()
         }
     }
@@ -251,50 +266,98 @@ fn add<'l>(q: &'l str, w: &'l str) -> Result<String, ParseIntError> {
 //27182818
 //3141 * 1000 + 592
 
-fn multiply(x: &str, y: &str) -> Result<String, ParseIntError> {
+fn multiply(x: &str, y: &str, debug: bool) -> Result<String, ParseIntError> {
+
+    if debug {
+        myprintln2!("___________START___________");
+    }
 
     if x.len() == 1 || y.len() == 1 {
         let a_parsed: i64 = x.parse::<i64>()?;
         let b_parsed: i64 = y.parse::<i64>()?;
         let res = a_parsed * b_parsed;
         let res_str = res.to_string();
+        if debug {
+            myprintln2!("res_str = {}", res_str);
+            myprintln2!("___________FINISH___________");
+        }
+
         return Ok(res_str);
     }
 
+    if debug {
+        myprintln2!("x = {}, y = {}", x, y);
+    }
 
-    let power = x.len() / 2;
-    let f_index = x.len() - power;
+    let mut minLen = x.len();
 
-    let mut x1 = &x[0..f_index];
-    let mut x0 = &x[f_index..x.len()];
+    if x.len() > y.len() {
+        minLen = y.len();
+    }
 
-    let mut y1 = &y[0..f_index];
-    let mut y0 = &y[f_index..y.len()];
+    let power = minLen / 2;
 
-    let a = multiply(x1,y1)?;
-    let b = multiply(x0,y0)?;
+    if debug {
+        myprintln2!("power = {}", power);
+    }
+
+
+
+    let x_index = x.len() - power;
+    let y_index = y.len() - power;
+
+    let mut x1 = &x[0..x_index];
+    let mut x0 = &x[x_index..x.len()];
+
+    let mut y1 = &y[0..y_index];
+    let mut y0 = &y[y_index..y.len()];
+
+    if debug {
+        myprintln2!("x1 = {}, x0 = {}", x1, x0);
+        myprintln2!("y1 = {}, y0 = {}", y1, y0);
+    }
+
+
+    let a = multiply(x1,y1, false)?;
+    let b = multiply(x0,y0, false)?;
     let c = add(x1, x0)?;
     let d = add(y1, y0)?;
-    let p = multiply(&c, &d )?;
+    let p = multiply(&c, &d , false)?;
 
-    let char1 = char::from_digit(2u32.pow(x.len()), 10)?;
-    let char2 = char::from_digit(2u32.pow(power), 10)?;
-    let h1 = multiply(&a, &char1.to_string())?;
+    if debug {
+        myprintln2!("a = {}, b = {}, c = {}, d = {}, p = {}", a,b,c,d,p);
+    }
+
+    let p_2 = (power * 2) as u32;
+    let p_1 = power as u32;
+
+    let mut h1 = a.clone();
+
+    for x in 0..p_2 {
+        h1.push('0');
+    }
+
     let h2 = subtract(&p, &a)?;
     let h3 = subtract(&h2, &b)?;
-    let h4 = multiply(&h3, &char2.to_string())?;
+
+    let mut h4 = h3.clone();
+
+    for x in 0..p_1 {
+        h4.push('0');
+    }
+
+
     let h5 = add(&h1, &h4)?;
     let h6 = add(&h5, &b)?;
 
+    if debug {
+        myprintln2!("h1 = {}, h2 = {}, h3 = {}, h4 = {}, h5 = {}", h1,h2,h3,h4,h5);
+        myprintln2!("res_str = {}", h6);
+        myprintln2!("___________FINISH___________");
+    }
+
     return Ok(h6);
 
-    let a_parsed: i64 = x.parse::<i64>()?;
-    let b_parsed: i64 = y.parse::<i64>()?;
-
-    let res = a_parsed * b_parsed;
-    let res_str = res.to_string();
-
-    return Ok(res_str);
 }
 #[cfg(test)]
 mod tests {
@@ -303,22 +366,50 @@ mod tests {
 
     #[test]
     fn test_mul1() {
-        assert_eq!(multiply("4", "8"), Ok("32".to_string()));
+        assert_eq!(multiply("4", "8", false), Ok("32".to_string()));
     }
-
+//
     #[test]
     fn test_mul2() {
-        assert_eq!(multiply("8", "8"), Ok("64".to_string()));
+        assert_eq!(multiply("8", "8", false), Ok("64".to_string()));
     }
 
     #[test]
     fn test_mul3() {
-        assert_eq!(multiply("58632", "897256"), Ok("52607913792".to_string()));
+        assert_eq!(multiply("8", "8", false), Ok("64".to_string()));
     }
 
     #[test]
     fn test_mul4() {
-        assert_eq!(multiply("8", "8"), Ok("64".to_string()));
+        assert_eq!(multiply("58632", "897256", true), Ok("52607913792".to_string()));
+    }
+
+    #[test]
+    fn test_mul5() {
+        assert_eq!(multiply("50", "50", false), Ok("2500".to_string()));
+    }
+
+    #[test]
+    fn test_mul6() {
+        assert_eq!(multiply("500", "500", false), Ok("250000".to_string()));
+    }
+
+
+    #[test]
+    fn test_mul7() {
+        assert_eq!(multiply("852147", "95689562", false), Ok("81541573189614".to_string()));
+    }
+
+    #[test]
+    fn test_mul8() {
+        assert_eq!(multiply("81541573189614", "95689562852147", false), Ok("7802677492790513577878001258".to_string()));
+    }
+
+    #[test]
+    fn test_mul9() {
+        assert_eq!(multiply("3141592653589793238462643383279502884197169399375105820974944592",
+                            "2718281828459045235360287471352662497757247093699959574966967627", false),
+                   Ok("8539734222673567065463550869546574495034888535765114961879601127067743044893204848617875072216249073013374895871952806582723184".to_string()));
     }
 
 
@@ -389,13 +480,13 @@ mod tests {
 }
 
 fn main() {
-    let first_num = "3141592653589793238462643383279502884197169399375105820974944592";
-    let second_num = "2718281828459045235360287471352662497757247093699959574966967627";
-    let first_num = "3";
-    let second_num = "2";
-    match multiply(first_num, second_num)  {
-        Ok(a) =>  println!("{}", a),
-        Err(e) => println!("{}", e.to_string()),
+//    let first_num = "3141592653589793238462643383279502884197169399375105820974944592";
+//    let second_num = "2718281828459045235360287471352662497757247093699959574966967627";
+    let first_num = "50";
+    let second_num = "50";
+    match multiply(first_num, second_num, true)  {
+        Ok(a) =>  myprintln!("{}", a),
+        Err(e) => myprintln!("{}", e.to_string()),
     }
 
 }
