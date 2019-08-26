@@ -1,9 +1,7 @@
 use std::num::ParseIntError;
 use std::mem;
-use std::str::Chars;
 use std::char;
-use std::ops::Deref;
-use std::io::{self, Write};
+
 
 macro_rules! myprintln {
       () => ();
@@ -19,7 +17,7 @@ macro_rules! myprintln2 {
     ($($arg:tt)*) => (println!($($arg)*));
 }
 
-fn isSmaller(q: &str, w: &str) -> bool {
+fn is_smaller(q: &str, w: &str) -> bool {
     // Calculate lengths of both string
     let n1 = q.len();
     let n2 = w.len();
@@ -64,14 +62,11 @@ fn subtract<'l>(q: &'l str, w: &'l str) -> Result<String, ParseIntError> {
     let mut a = q.clone().to_string();
     let mut b = w.clone().to_string();
 
-    let mut was_swapped = false;
-
     // Before proceeding further, make sure str1
     // is not smaller
 
-    if isSmaller(&a, &b) {
+    if is_smaller(&a, &b) {
         mem::swap(  &mut a, &mut b);
-        was_swapped = true;
     }
 
     // Take an empty string for storing result
@@ -89,7 +84,7 @@ fn subtract<'l>(q: &'l str, w: &'l str) -> Result<String, ParseIntError> {
     let a_rev_vec = a_rev.collect::<Vec<char>>();
     let b_rev_vec = b_rev.collect::<Vec<char>>();
 
-    let mut sub: u32 = 0;
+    let mut sub: u32;
     // Run loop till small string length
     // and subtract digit of str1 to str2
     for x in b_rev_vec.iter().enumerate() {
@@ -199,7 +194,7 @@ fn add<'l>(q: &'l str, w: &'l str) -> Result<String, ParseIntError> {
 
     myprintln!("----------------------");
 
-    let mut sum: u32 = 0;
+    let mut sum: u32;
     for x in a_rev_vec.iter().enumerate(){
 
         let a_char_val = *x.1;
@@ -289,13 +284,13 @@ fn multiply(x: &str, y: &str, debug: bool) -> Result<String, ParseIntError> {
         myprintln2!("x = {}, y = {}", x, y);
     }
 
-    let mut minLen = x.len();
+    let mut min_len = x.len();
 
     if x.len() > y.len() {
-        minLen = y.len();
+        min_len = y.len();
     }
 
-    let power = minLen / 2;
+    let power = min_len / 2;
 
     if debug {
         myprintln2!("power = {}", power);
@@ -306,11 +301,11 @@ fn multiply(x: &str, y: &str, debug: bool) -> Result<String, ParseIntError> {
     let x_index = x.len() - power;
     let y_index = y.len() - power;
 
-    let mut x1 = &x[0..x_index];
-    let mut x0 = &x[x_index..x.len()];
+    let x1 = &x[0..x_index];
+    let x0 = &x[x_index..x.len()];
 
-    let mut y1 = &y[0..y_index];
-    let mut y0 = &y[y_index..y.len()];
+    let y1 = &y[0..y_index];
+    let y0 = &y[y_index..y.len()];
 
     if debug {
         myprintln2!("x1 = {}, x0 = {}", x1, x0);
@@ -333,7 +328,7 @@ fn multiply(x: &str, y: &str, debug: bool) -> Result<String, ParseIntError> {
 
     let mut h1 = a.clone();
 
-    for x in 0..p_2 {
+    for _x in 0..p_2 {
         h1.push('0');
     }
 
@@ -342,7 +337,7 @@ fn multiply(x: &str, y: &str, debug: bool) -> Result<String, ParseIntError> {
 
     let mut h4 = h3.clone();
 
-    for x in 0..p_1 {
+    for _x in 0..p_1 {
         h4.push('0');
     }
 
@@ -439,22 +434,22 @@ mod tests {
 
     #[test]
     fn is_smaller1() {
-        assert_eq!(isSmaller( "1", "2"), true);
+        assert_eq!(is_smaller("1", "2"), true);
     }
 
     #[test]
     fn is_smaller2() {
-        assert_eq!(isSmaller( "3", "2"), false);
+        assert_eq!(is_smaller("3", "2"), false);
     }
 
     #[test]
     fn is_smaller3() {
-        assert_eq!(isSmaller( "121", "2123123"), true);
+        assert_eq!(is_smaller("121", "2123123"), true);
     }
 
     #[test]
     fn is_smaller4() {
-        assert_eq!(isSmaller( "1211231231", "2123123"), false);
+        assert_eq!(is_smaller("1211231231", "2123123"), false);
     }
 
 
@@ -479,17 +474,14 @@ mod tests {
     }
 }
 
-mod karatsuba {
-
-    pub fn run() {
-//    let first_num = "3141592653589793238462643383279502884197169399375105820974944592";
-//    let second_num = "2718281828459045235360287471352662497757247093699959574966967627";
-        let first_num = "50";
-        let second_num = "50";
-        match multiply(first_num, second_num, true)  {
-            Ok(a) =>  myprintln!("{}", a),
-            Err(e) => myprintln!("{}", e.to_string()),
-        }
-
+pub fn run() {
+//   let first_num = "3141592653589793238462643383279502884197169399375105820974944592";
+//   let second_num = "2718281828459045235360287471352662497757247093699959574966967627";
+    let first_num = "50";
+    let second_num = "50";
+    match multiply(first_num, second_num, false)  {
+        Ok(a) =>  println!("Karatsuba = {}", a),
+        Err(e) => println!("{}", e.to_string()),
     }
 }
+
