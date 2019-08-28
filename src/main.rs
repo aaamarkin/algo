@@ -1,11 +1,10 @@
 mod karatsuba;
 mod inversions;
 mod quicksort;
+mod thread;
 
 fn main() {
 
-    karatsuba::run();
-    inversions::run();
-    quicksort::run();
+    thread::run();
 
 }
