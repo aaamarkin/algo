@@ -1,20 +1,9 @@
+use crate::myprintln;
+use crate::myprintln2;
 use std::num::ParseIntError;
 use std::mem;
 use std::char;
 
-macro_rules! myprintln {
-      () => ();
-      ($($arg:tt)*) => (print!(""));
-//    () => ($crate::print!("\n"));
-//    ($($arg:tt)*) => (println!($($arg)*));
-}
-
-macro_rules! myprintln2 {
-//      () => ();
-//      ($($arg:tt)*) => (print!(""));
-    () => ($crate::print!("\n"));
-    ($($arg:tt)*) => (println!($($arg)*));
-}
 
 fn is_smaller(q: &str, w: &str) -> bool {
     // Calculate lengths of both string
