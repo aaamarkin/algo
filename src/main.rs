@@ -1,7 +1,8 @@
 mod karatsuba;
-mod inversions;
+pub mod inversions;
 mod quicksort;
 mod thread;
+pub mod file;
 
 fn main() {
 

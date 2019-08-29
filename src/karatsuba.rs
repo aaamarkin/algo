@@ -2,7 +2,6 @@ use std::num::ParseIntError;
 use std::mem;
 use std::char;
 
-
 macro_rules! myprintln {
       () => ();
       ($($arg:tt)*) => (print!(""));
