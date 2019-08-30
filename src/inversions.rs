@@ -1,4 +1,4 @@
-use crate::file::read_file;
+use crate::file::read_file_to_vec;
 
 fn inversions(vector: Vec<i32>) -> (Vec<i32>, i64){
     if vector.len() == 1 {
@@ -245,7 +245,7 @@ pub fn run() {
 
     let file_name = "IntegerArray.txt";
 
-    let vector = read_file(file_name).unwrap();
+    let vector = read_file_to_vec(file_name).unwrap();
 
     println!("Inversions - {}", inversions(vector).1)
 }
