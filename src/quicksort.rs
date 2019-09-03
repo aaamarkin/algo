@@ -161,7 +161,7 @@ pub fn run() {
     let mut vec = read_file_to_vec(file_name).unwrap();
     let array = vec.as_mut();
 
-    let t = &mut [5,6,7,10,11,12,13,20,30,40,50,60,1,2,3,4,8,9,14,15,16,5,6,7,10,11,12,13,20,30,40,50,60,1,2,3,4,8,9,14,15,16];
+
     let num = sort(array,0);
     myprintln2!("Quicksort {:?}", num);
 
