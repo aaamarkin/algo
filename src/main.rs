@@ -9,7 +9,7 @@ pub mod file;
 
 fn main() {
 
-    karatsuba::run();
-    quicksort::run();
+//    karatsuba::run();
+//    quicksort::run();
     mincut::run();
 }

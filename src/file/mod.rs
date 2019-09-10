@@ -1,7 +1,8 @@
-use std::io::BufReader;
+use std::io::{BufReader, Read};
 use std::io::BufRead;
 use crate::mincut;
 use crate::mincut::ALE;
+use std::fs;
 
 pub fn read_file_to_vec(file_name: &str) -> Result<Vec<i32>, std::io::Error> {
 
@@ -18,15 +19,23 @@ pub fn read_file_to_vec(file_name: &str) -> Result<Vec<i32>, std::io::Error> {
     return Ok(vector);
 }
 
-pub fn read_file_to_ale_list(file_name: &str) -> Result<Vec<ALE>, std::io::Error> {
+pub fn read_file_to_string(file_name: &str) -> Result<String, std::io::Error> {
 
     println!("In file {}", file_name);
+
+    let file_str = fs::read_to_string(file_name)?;
+
+    return Ok(file_str);
+
+
+
+}
+pub fn read_string_to_ale(str: String) -> Vec<ALE> {
+
     let mut vector: Vec<ALE> = Vec::new();
 
-    let f = (std::fs::File::open(file_name))?;
-    let file = BufReader::new(&f);
-    for line in file.lines() {
-        let l = line.unwrap();
+    for line in str.lines() {
+        let l = line;
         let split = l.split_whitespace().collect::<Vec<&str>>();;
         let mut nodes:Vec<i32> = Vec::new();
         nodes.push(split[0].parse().unwrap());
@@ -45,7 +54,8 @@ pub fn read_file_to_ale_list(file_name: &str) -> Result<Vec<ALE>, std::io::Error
 
         vector.push(ale);
     }
-    return Ok(vector);
+
+    return vector;
 }
 
 //pub fn read_file_to_array(file_name: &str) -> Result<&mut [i32], std::io::Error> {
