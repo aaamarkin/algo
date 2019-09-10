@@ -60,15 +60,13 @@ fn naive_contract(node_1: i32, node_2: i32, graph: Vec<ALE>) -> Vec<ALE> {
     for i in 0..graph.len(){
         let mut ale = graph[i].clone();
 
-        for j in 0..ale.edges.len() {
-            if ale.edges[j] == node_2 {
-                ale.edges[j] = node_1;
-            }
-        }
-
-        ale.edges.sort();
-
         if !ale.nodes.contains(&node_1) && !ale.nodes.contains(&node_2) {
+            for j in 0..ale.edges.len() {
+                if ale.edges[j] == node_2 {
+                    ale.edges[j] = node_1;
+                }
+            }
+            ale.edges.sort();
             vector.push(ale);
         } else if ale.nodes.contains(&node_1) {
             node_1_ale = ale;
@@ -79,12 +77,24 @@ fn naive_contract(node_1: i32, node_2: i32, graph: Vec<ALE>) -> Vec<ALE> {
 
     node_1_ale.nodes.push(node_2);
 
+    let mut edges: Vec<i32> = Vec::new();
+
     for j in 0..node_2_ale.edges.len() {
-        node_1_ale.edges.push(node_2_ale.edges[j]);
+        if node_2_ale.edges[j] != node_2 && node_2_ale.edges[j] != node_1 {
+            edges.push(node_2_ale.edges[j]);
+        }
+    }
+
+    for j in 0..node_1_ale.edges.len() {
+        if node_1_ale.edges[j] != node_1 && node_1_ale.edges[j] != node_2{
+            edges.push(node_1_ale.edges[j]);
+        }
     }
 
     node_1_ale.nodes.sort();
-    node_1_ale.edges.sort();
+    edges.sort();
+
+    node_1_ale.edges = edges;
 
     vector.push(node_1_ale);
 
@@ -106,7 +116,7 @@ mod tests {
 
         let resultGraph = naive_contract(1, 2, initialGraph.to_vec());
 
-        let correctResult = vec![ALE { nodes: vec![1, 2], edges: vec![1, 1, 3, 3] }, ALE { nodes: vec![3], edges: vec![1, 1] }];
+        let correctResult = vec![ALE { nodes: vec![1, 2], edges: vec![3, 3] }, ALE { nodes: vec![3], edges: vec![1, 1] }];
 
         assert_eq!(correctResult, resultGraph);
     }
@@ -118,13 +128,13 @@ mod tests {
 
         let mut resultGraph = naive_contract(1, 2, initialGraph.to_vec());
 
-        let mut correctResult = vec![ALE { nodes: vec![1, 2], edges: vec![1, 1, 3, 4] }, ALE { nodes: vec![3], edges: vec![1, 4] }, ALE { nodes: vec![4], edges: vec![1, 3] }];
+        let mut correctResult = vec![ALE { nodes: vec![1, 2], edges: vec![3, 4] }, ALE { nodes: vec![3], edges: vec![1, 4] }, ALE { nodes: vec![4], edges: vec![1, 3] }];
 
         assert_eq!(correctResult, resultGraph);
 
         let mut resultGraph = naive_contract(1, 3, resultGraph.to_vec());
 
-        let mut correctResult = vec![ALE { nodes: vec![1, 2, 3], edges: vec![1, 1, 1, 1, 4, 4] }, ALE { nodes: vec![4], edges: vec![1, 1] }];
+        let mut correctResult = vec![ALE { nodes: vec![1, 2, 3], edges: vec![4, 4] }, ALE { nodes: vec![4], edges: vec![1, 1] }];
 
         assert_eq!(correctResult, resultGraph);
     }
@@ -136,13 +146,13 @@ mod tests {
 
         let mut resultGraph = naive_contract(1, 2, initialGraph.to_vec());
 
-        let mut correctResult = vec![ALE { nodes: vec![1, 2], edges: vec![1, 1, 3, 3, 4] }, ALE { nodes: vec![3], edges: vec![1, 1, 4] }, ALE { nodes: vec![4], edges: vec![1, 3] }];
+        let mut correctResult = vec![ALE { nodes: vec![1, 2], edges: vec![3, 3, 4] }, ALE { nodes: vec![3], edges: vec![1, 1, 4] }, ALE { nodes: vec![4], edges: vec![1, 3] }];
 
         assert_eq!(correctResult, resultGraph);
 
         let mut resultGraph = naive_contract(1, 3, resultGraph.to_vec());
 
-        let mut correctResult = vec![ALE { nodes: vec![1, 2, 3], edges: vec![1, 1, 1, 1, 1, 1, 4, 4] }, ALE { nodes: vec![4], edges: vec![1, 1] }];
+        let mut correctResult = vec![ALE { nodes: vec![1, 2, 3], edges: vec![4, 4] }, ALE { nodes: vec![4], edges: vec![1, 1] }];
 
         assert_eq!(correctResult, resultGraph);
     }
@@ -154,13 +164,13 @@ mod tests {
 
         let mut resultGraph = naive_contract(2, 3, initialGraph.to_vec());
 
-        let mut correctResult = vec![ALE { nodes: vec![1], edges: vec![2, 2, 4] }, ALE { nodes: vec![2, 3], edges: vec![1, 1, 2, 2, 4, 4] }, ALE { nodes: vec![4], edges: vec![1, 2, 2] }];
+        let mut correctResult = vec![ALE { nodes: vec![1], edges: vec![2, 2, 4] }, ALE { nodes: vec![2, 3], edges: vec![1, 1, 4, 4] }, ALE { nodes: vec![4], edges: vec![1, 2, 2] }];
 
         assert_eq!(correctResult, resultGraph);
 
         let mut resultGraph = naive_contract(1, 4, resultGraph.to_vec());
 
-        let mut correctResult = vec![ALE { nodes: vec![1, 4], edges: vec![1, 1, 2, 2, 2, 2] }, ALE { nodes: vec![2, 3], edges: vec![1, 1, 1, 1, 2, 2] }];
+        let mut correctResult = vec![ALE { nodes: vec![1, 4], edges: vec![2, 2, 2, 2] }, ALE { nodes: vec![2, 3], edges: vec![1, 1, 1, 1] }];
 
         assert_eq!(correctResult, resultGraph);
     }
@@ -172,13 +182,13 @@ mod tests {
 
         let mut resultGraph = naive_contract(2, 3, initialGraph.to_vec());
 
-        let mut correctResult = vec![ALE { nodes: vec![1], edges: vec![2, 2, 4] }, ALE { nodes: vec![2, 3], edges: vec![1, 1, 2, 2, 4, 4] }, ALE { nodes: vec![4], edges: vec![1, 2, 2] }];
+        let mut correctResult = vec![ALE { nodes: vec![1], edges: vec![2, 2, 4] }, ALE { nodes: vec![2, 3], edges: vec![1, 1, 4, 4] }, ALE { nodes: vec![4], edges: vec![1, 2, 2] }];
 
         assert_eq!(correctResult, resultGraph);
 
         let mut resultGraph = naive_contract(4, 2, resultGraph.to_vec());
 
-        let mut correctResult = vec![ALE { nodes: vec![1], edges: vec![4, 4, 4] }, ALE { nodes: vec![2, 4], edges: vec![1, 1, 1, 4, 4, 4, 4, 4, 4] }];
+        let mut correctResult = vec![ALE { nodes: vec![1], edges: vec![4, 4, 4] }, ALE { nodes: vec![2, 4], edges: vec![1, 1, 1] }];
 
         assert_eq!(correctResult, resultGraph);
     }
