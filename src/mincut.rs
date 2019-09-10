@@ -15,6 +15,7 @@ use std::cmp::Ordering;
 use crate::file::{read_string_to_ale, read_file_to_string};
 use crate::{myprintln, myprintln2};
 use std::error::Error;
+use rand::Rng;
 
 #[derive(Clone, Eq)]
 pub struct ALE {
@@ -46,7 +47,6 @@ impl PartialOrd for ALE {
         Some(self.cmp(other))
     }
 }
-
 
 fn naive_contract(node_1: i32, node_2: i32, graph: Vec<ALE>) -> Vec<ALE> {
 
@@ -103,11 +103,24 @@ fn naive_contract(node_1: i32, node_2: i32, graph: Vec<ALE>) -> Vec<ALE> {
     return vector;
 }
 
+fn random_contraction(graph: Vec<ALE>) -> Vec<ALE> {
+
+    let mut g: Vec<ALE> = graph.to_vec();
+
+
+    while g.len() > 2 {
+        let n1: i32 = rng.gen();
+        let n2: i32 = rng.gen();
+        g = naive_contract(n1, n2, g);
+    }
+
+    return g;
+}
+
 #[cfg(test)]
 mod tests {
 
     use super::*;
-
 
     #[test]
     fn test_naive_contract0() {
